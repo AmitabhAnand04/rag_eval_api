@@ -5,7 +5,7 @@ from apis.file_process import file_router
 
 
 app = FastAPI()
-app.include_router(router=file_router)
+app.include_router(router=file_router, prefix="/v1")
 
 
 if __name__ == "__main__":

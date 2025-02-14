@@ -34,17 +34,68 @@ def get_item(fileID):
     except exceptions.CosmosHttpResponseError as e:
         return f"Failure: An error occurred - {e.message}"
 
+# Old code which updates only response in the test set.
+
+# def update_item(fileID, question_responses):
+#     """
+#     Update multiple responses for given questionIDs in the Cosmos DB item.
+
+#     :param fileID: str - The ID of the item to update.
+#     :param question_responses: dict - A dictionary where keys are questionIDs and values are their responses.
+#     EXAMPLE: question_responses = {
+#     "21c08461-192a-45d4-b83c-e894bd7b34d9": "Response for cerebrovascular disease",
+#     "615429a9-3e7f-4f19-92af-2410bd4b784c": "Response for pulmonary embolism"
+#     }
+
+#     """
+#     try:
+#         # Query the item
+#         query = f"SELECT * FROM c WHERE c.id = '{fileID}'"
+#         items = list(container.query_items(query=query, enable_cross_partition_query=True))
+
+#         if not items:
+#             print("❌ Item not found.")
+#             return "Item not found."
+
+#         item = items[0]  # Retrieve the first matching item
+
+#         # Update the response for the matching questionIDs
+#         updated = False
+#         for question in item.get("testset", []):
+#             if question["questionID"] in question_responses:
+#                 question["response"] = question_responses[question["questionID"]]
+#                 updated = True
+
+#         # Replace the item in Cosmos DB if updates were made
+#         if updated:
+#             container.replace_item(item=item["id"], body=item)
+#             print(f"✅ Updated item with ID: {fileID} for questionIDs: {list(question_responses.keys())}")
+#             return f"Updated item with ID: {fileID} for questionIDs: {list(question_responses.keys())}"
+#         else:
+#             print("ℹ️ No updates made.")
+#             return "No matching questionIDs found."
+    
+#     except exceptions.CosmosHttpResponseError as e:
+#         return f"Failure: An error occurred - {e.message}"
+
 def update_item(fileID, question_responses):
     """
-    Update multiple responses for given questionIDs in the Cosmos DB item.
+    Update multiple fields (response, reference_contexts, reference) for given questionIDs in the Cosmos DB item.
 
     :param fileID: str - The ID of the item to update.
-    :param question_responses: dict - A dictionary where keys are questionIDs and values are their responses.
-    EXAMPLE: question_responses = {
-    "21c08461-192a-45d4-b83c-e894bd7b34d9": "Response for cerebrovascular disease",
-    "615429a9-3e7f-4f19-92af-2410bd4b784c": "Response for pulmonary embolism"
+    :param question_responses: dict - A dictionary where keys are questionIDs and values are dictionaries containing response, reference_contexts, and reference.
+    
+    EXAMPLE:
+    question_responses = {
+        "21c08461-192a-45d4-b83c-e894bd7b34d9": {
+            "response": "Response for cerebrovascular disease",
+            "reference_contexts": ["Context 1", "Context 2"],
+            "reference": "Reference 1"
+        },
+        "615429a9-3e7f-4f19-92af-2410bd4b784c": {
+            "response": "Response for pulmonary embolism"
+        }
     }
-
     """
     try:
         # Query the item
@@ -57,11 +108,19 @@ def update_item(fileID, question_responses):
 
         item = items[0]  # Retrieve the first matching item
 
-        # Update the response for the matching questionIDs
+        # Update the fields for the matching questionIDs
         updated = False
         for question in item.get("testset", []):
             if question["questionID"] in question_responses:
-                question["response"] = question_responses[question["questionID"]]
+                question_data = question_responses[question["questionID"]]
+                
+                # question["response"] = question_data.get("response", question.get("response"))
+                # question["reference_contexts"] = question_data.get("reference_contexts", question.get("reference_contexts", []))
+                # question["reference"] = question_data.get("reference", question.get("reference"))
+                question["response"] = question_data.response if question_data.response is not None else question.get("response")
+                question["reference_contexts"] = question_data.reference_contexts if question_data.reference_contexts is not None else question.get("reference_contexts", [])
+                question["reference"] = question_data.reference if question_data.reference is not None else question.get("reference")
+
                 updated = True
 
         # Replace the item in Cosmos DB if updates were made
@@ -75,7 +134,8 @@ def update_item(fileID, question_responses):
     
     except exceptions.CosmosHttpResponseError as e:
         return f"Failure: An error occurred - {e.message}"
-    
+
+
 def get_item_for_evaluation(fileID):
     query = f'SELECT c.testset FROM c where c.id = "{fileID}"'
     res = list(container.query_items(query=query, enable_cross_partition_query=True))

@@ -1,3 +1,4 @@
+import math
 from ragas.metrics import (
     Faithfulness,
     ResponseRelevancy,
@@ -28,6 +29,8 @@ os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 evaluator_llm = LlamaIndexLLMWrapper(OpenAI(model="gpt-4o"))
 evaluator_embeddings = LangchainEmbeddingsWrapper(OpenAIEmbeddings())
 
+def replace_nan_with_zero(value):
+    return 0 if isinstance(value, float) and math.isnan(value) else value
 # ---------------- Synchronous Multiprocessing Functions ----------------
 def calculate_faithfulness(user_input: str, response: str, retrieved_contexts: list, queue):
     sample = SingleTurnSample(
@@ -37,7 +40,7 @@ def calculate_faithfulness(user_input: str, response: str, retrieved_contexts: l
         )
     scorer = Faithfulness(llm=evaluator_llm)
     # queue.put("faithfulness", scorer.single_turn_score(sample))  # Removed 'await' since it's synchronous
-    score = {"metric":"faithfulness","score":scorer.single_turn_score(sample)}
+    score = {"metric":"faithfulness","score":replace_nan_with_zero(scorer.single_turn_score(sample))}
     print(score)
     queue.put(score)
 
@@ -49,7 +52,7 @@ def calculate_response_relevancy(user_input: str, response: str, retrieved_conte
     )
     scorer = ResponseRelevancy(llm=evaluator_llm, embeddings=evaluator_embeddings)
     # queue.put("res_relevency", scorer.single_turn_score(sample))  # Removed 'await'
-    score = {"metric":"res_relevency","score":scorer.single_turn_score(sample)}
+    score = {"metric":"res_relevency","score":replace_nan_with_zero(scorer.single_turn_score(sample))}
     print(score)
     queue.put(score)  
     
@@ -62,7 +65,7 @@ def calculate_answer_correctness(user_input: str, response: str, reference: str,
     raga_dataset = Dataset.from_dict(sample)
     score_0998 = evaluate(raga_dataset,metrics=[answer_correctness])
     if score_0998:
-        score = {"metric":"answer_correctness","score":score_0998["answer_correctness"][0]}
+        score = {"metric":"answer_correctness","score":replace_nan_with_zero(score_0998["answer_correctness"][0])}
     print(score)
     queue.put(score)
 
@@ -75,7 +78,7 @@ def calculate_context_precision(user_input: str, response: str, retrieved_contex
         retrieved_contexts=retrieved_contexts, 
     )
     # queue.put("context_precision", context_precision.single_turn_score(sample))  # Removed 'await'
-    score = {"metric":"context_precision","score":context_precision.single_turn_score(sample)}
+    score = {"metric":"context_precision","score":replace_nan_with_zero(context_precision.single_turn_score(sample))}
     print(score)
     queue.put(score) 
 
@@ -88,7 +91,7 @@ def calculate_context_recall(user_input: str, response: str, retrieved_contexts:
     )
     context_recall = LLMContextRecall(llm=evaluator_llm)
     # queue.put("context_recall", context_recall.single_turn_score(sample))  # Removed 'await'
-    score = {"metric":"context_recall","score":context_recall.single_turn_score(sample)}
+    score = {"metric":"context_recall","score":replace_nan_with_zero(context_recall.single_turn_score(sample))}
     print(score)
     queue.put(score) 
 
@@ -135,7 +138,7 @@ def run_all_metrics(df: pd.DataFrame, fileID):
         print("Updating Cosmos!!")
         res = update_score_list(fileID=fileID, questionID=qID, score_list=scorelist)
         print(res)
-    return "Score metrics stored sucessfully!!"
+    return "Metrics score stored sucessfully!!"
 # if __name__ == "__main__":
 #     mp.set_start_method("spawn", force=True)  # Set at the beginning
 #     df = read_testset(file_name="testset_response_(WCF)_9.csv")

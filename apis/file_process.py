@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, Optional
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 import tempfile
 import os
@@ -12,8 +12,18 @@ from utils.refactor import transform_data, transform_to_df
 file_router = APIRouter()
 
 # Define Pydantic model for request body
+class ResponseDetails(BaseModel):
+    response: str
+    reference: Optional[str] = None
+    reference_contexts: Optional[List[str]] = []
+
 class QuestionResponse(BaseModel):
-    responses: Dict[str, str]
+    responses: Dict[str, ResponseDetails]
+
+@file_router.get("/")
+def welcome():
+    print("This API is Live!!")
+    return "This API is Live!!"
 
 @file_router.post("/upload/") # API 1
 async def process_file(file: UploadFile = File(...), testset_size: int = Form(2)):
