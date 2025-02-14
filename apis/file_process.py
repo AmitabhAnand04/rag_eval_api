@@ -4,7 +4,7 @@ import tempfile
 import os
 
 from pydantic import BaseModel
-from services.cosmos_service import get_item, insert_items, update_item, get_item_for_evaluation
+from services.cosmos_service import get_item, get_score_item, insert_items, update_item, get_item_for_evaluation
 from utils.create_testset import generate_testset
 from utils.evaluation import run_all_metrics
 from utils.refactor import transform_data, transform_to_df
@@ -59,5 +59,9 @@ def evaluate(fileID):
     items = get_item_for_evaluation(fileID)
     # print(items)
     ragas_df = transform_to_df(items["testset"])
-    ragas_df.to_csv("eval.csv", index=False)
-    # return run_all_metrics(df=ragas_df, fileID=fileID)
+    # ragas_df.to_csv("eval.csv", index=False)
+    return run_all_metrics(df=ragas_df, fileID=fileID)
+
+@file_router.get("/get_scores/") # API 5
+def scores(fileID):
+    return get_score_item(fileID)

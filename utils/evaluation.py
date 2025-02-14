@@ -95,8 +95,12 @@ def calculate_context_recall(user_input: str, response: str, retrieved_contexts:
 # ---------------- Running All Metrics ----------------
 def run_all_metrics(df: pd.DataFrame, fileID):
     queue = mp.Queue()
+    print("Trying to run all metrices with the testset!!")
     for index, row in df.iterrows():
-        retrieved_contexts = ast.literal_eval(row["reference_contexts"])  # Safer than eval()
+        print("trying to retrive reference_contexts!!")
+        # retrieved_contexts = ast.literal_eval(row["reference_contexts"])  # Safer than eval()
+        retrieved_contexts = row["reference_contexts"]  # Safer than eval()
+        print("Context Retrived!!")
         qID = row["questionID"]
         p1 = mp.Process(target=calculate_faithfulness, args=(row["user_input"], row["response"], retrieved_contexts, queue))
         p2 = mp.Process(target=calculate_response_relevancy, args=(row["user_input"], row["response"], retrieved_contexts, queue))
@@ -127,9 +131,11 @@ def run_all_metrics(df: pd.DataFrame, fileID):
         scorelist.append(score3)
         scorelist.append(score4)
         scorelist.append(score5)
-
-        return update_score_list(fileID=fileID, questionID=qID, score_list=scorelist)
-        
+        print("Evaluation Sucess!!")
+        print("Updating Cosmos!!")
+        res = update_score_list(fileID=fileID, questionID=qID, score_list=scorelist)
+        print(res)
+    return "Score metrics stored sucessfully!!"
 # if __name__ == "__main__":
 #     mp.set_start_method("spawn", force=True)  # Set at the beginning
 #     df = read_testset(file_name="testset_response_(WCF)_9.csv")

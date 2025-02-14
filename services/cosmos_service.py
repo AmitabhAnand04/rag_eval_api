@@ -114,3 +114,32 @@ def update_score_list(fileID, questionID, score_list):
         print("No matching fileID found.")
         return "No matching fileID found."
 
+def get_score_item(fileID):
+    try:
+        # Query the item by id
+        query = f"SELECT * FROM c WHERE c.id = '{fileID}'"
+        items = list(container.query_items(query=query, enable_cross_partition_query=True))
+        
+        if not items:
+            return {"error": "Item not found"}
+        
+        item = items[0]
+        
+        # Extract relevant fields
+        extracted_data = []
+        for test in item.get("testset", []):
+            extracted_data.append({
+                "questionID": test.get("questionID"),
+                "user_input": test.get("user_input"),
+                "response": test.get("response"),
+                "context_precision": test.get("metrics_score", {}).get("context_precision"),
+                "context_recall": test.get("metrics_score", {}).get("context_recall"),
+                "res_relevency": test.get("metrics_score", {}).get("res_relevency"),
+                "faithfulness": test.get("metrics_score", {}).get("faithfulness"),
+                "answer_correctness": test.get("metrics_score", {}).get("answer_correctness")
+            })
+        
+        return {"fileID": fileID, "scores": extracted_data}
+    except Exception as e:
+        return {"error": str(e)}
+

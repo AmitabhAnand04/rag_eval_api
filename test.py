@@ -1,4 +1,4 @@
-from services.cosmos_service import get_item, get_item_for_evaluation, insert_items, update_item, update_score_list
+from services.cosmos_service import get_item, get_item_for_evaluation, get_score_item, insert_items, update_item, update_score_list
 # from utils.refactor import transform_to_df, extract_questions_to_df, transform_data
 
 # input_list = [
@@ -63,12 +63,14 @@ from services.cosmos_service import get_item, get_item_for_evaluation, insert_it
 # print(extract(data))
 
 # Example usage
-fileID = "d3dc255e-c860-41d0-9bea-1516c54658ca"
-questionID = "13f34770-0175-40f7-acda-18c63820af39"
-scoreList = [
-    {"metric":"score1", "score": 34},
-    {"metric":"score2", "score": 3},
-    {"metric":"score3", "score": 2124},
-    {"metric":"score4", "score": 2365},
-]
-update_score_list(fileID, questionID, scoreList)
+# fileID = "d3dc255e-c860-41d0-9bea-1516c54658ca"
+# questionID = "13f34770-0175-40f7-acda-18c63820af39"
+# scoreList = [
+#     {"metric":"score1", "score": 34},
+#     {"metric":"score2", "score": 3},
+#     {"metric":"score3", "score": 2124},
+#     {"metric":"score4", "score": 2365},
+# ]
+# update_score_list(fileID, questionID, scoreList)
+# fileID = "2eed3f93-9822-4715-9b37-ade11e713dc3"
+# print(get_score_item(fileID=fileID))
