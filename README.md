@@ -8,7 +8,7 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
 ### Base Url: https://app-rageval-api-dev.azurewebsites.net/v1/
 
 ### 1. Upload File & Generate Testset
-**Endpoint:** `POST /upload/`
+**Endpoint:** `POST /upload`
 
 **Description:**
 - Accepts a PDF file and generates a test set from its contents.
@@ -16,7 +16,7 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
 - Returns a unique `fileID` for future reference.
 
 **Request:**
-- **File:** PDF file (multipart/form-data)
+- **file:** PDF file (multipart/form-data)
 - **testset_size:** Integer (default: 2)
 
 **Response:**
@@ -29,7 +29,7 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
 ```
 
 ### 2. Retrieve Testset
-**Endpoint:** `GET /get_testset/`
+**Endpoint:** `GET /get_testset`
 
 **Description:**
 - Fetches the generated test set from Cosmos DB using a given `fileID`.
@@ -45,23 +45,19 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
         "questionID":"62d22251-d344-4014-b830-3b1c68d804a7",
         "user_input":"What heart disease mean and what types there is?",
         "reference_contexts":["Context"],
-        "reference":"reference",
-        "synthesizer_name":"single_hop_specifc_query_synthesizer",
-        "response":"Response for cerebrovascular disease"
+        "reference":"reference"
     },
     {
         "questionID":"62d22251-d344-4014-b830-3b1c68d804a7",
         "user_input":"Question",
         "reference_contexts":["Context"],
-        "reference":"reference",
-        "synthesizer_name":"single_hop_specifc_query_synthesizer",
-        "response":"Response for cerebrovascular disease"
+        "reference":"reference"
     }
 ]
 ```
 
 ### 3. Submit Responses
-**Endpoint:** `POST /submit/`
+**Endpoint:** `POST /submit`
 
 **Description:**
 - Updates the stored test set with user-provided responses.
@@ -76,12 +72,12 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
 {
     "responses": {
         "questionID": {
-            "response": "Response",
-            "reference": "Reference",
-            "reference_contexts": []
+            "response": "Response", // Answer from any RAG model/framework
+            "reference": "Reference", // If user wants to test correctness of retrived context from RAG Framework
+            "reference_contexts": ['string','string'] // If user wants to test correctness of retrived context from RAG Framework
         },
         "questionID": {
-            "response": "Response"
+            "response": "Response" // Answer from any RAG model/framework
         }
     }
 }
@@ -92,7 +88,7 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
 - Updated item with ID: 636ba648-f530-4e14-94aa-50a5a8c304e2 for questionIDs: ['d9406015-e165-4804-ad60-ce21a41e8098', '227b7d98-2c79-449d-ace7-bad4df37cd0b']
 
 ### 4. Evaluate Responses
-**Endpoint:** `POST /evaluate/`
+**Endpoint:** `POST /evaluate`
 
 **Description:**
 - Runs evaluation metrics on the responses in the test set.
@@ -105,7 +101,7 @@ The MagicAudit RAGAS APIs provide an evaluation framework for question-answering
 - Computed evaluation metrics stored in Cosmos DB.
 
 ### 5. Retrieve Evaluation Scores
-**Endpoint:** `GET /get_scores/`
+**Endpoint:** `GET /get_scores`
 
 **Description:**
 - Fetches stored evaluation scores and results for a given `fileID`.

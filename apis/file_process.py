@@ -25,7 +25,7 @@ def welcome():
     print("This API is Live!!")
     return "This API is Live!!"
 
-@file_router.post("/upload/") # API 1
+@file_router.post("/upload") # API 1
 async def process_file(file: UploadFile = File(...), testset_size: int = Form(2)):
     if file.content_type not in ["application/pdf"]:
         raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are allowed.")
@@ -48,7 +48,7 @@ async def process_file(file: UploadFile = File(...), testset_size: int = Form(2)
     fileID = insert_items(response)
     return {"fileID": fileID, "message": f"Item stored with file id {fileID}", "response": response}
     
-@file_router.get("/get_testset/") #API 2
+@file_router.get("/get_testset") #API 2
 def getitem(fileID):
     try:
         res = get_item(fileID=fileID)
@@ -56,7 +56,7 @@ def getitem(fileID):
     except Exception as e:
         raise HTTPException (status_code= 500, detail=str(e))
     
-@file_router.post("/submit/") # API 3
+@file_router.post("/submit") # API 3
 def submit(fileID, request_body: QuestionResponse = None):
     if not request_body:
         raise HTTPException(status_code=400, detail="Invalid request body.")
@@ -64,7 +64,7 @@ def submit(fileID, request_body: QuestionResponse = None):
     response = update_item(fileID, request_body.responses)
     return response
 
-@file_router.post("/evaluate/") # API 4
+@file_router.post("/evaluate") # API 4
 def evaluate(fileID):
     items = get_item_for_evaluation(fileID)
     # print(items)
@@ -72,6 +72,6 @@ def evaluate(fileID):
     # ragas_df.to_csv("eval.csv", index=False)
     return run_all_metrics(df=ragas_df, fileID=fileID)
 
-@file_router.get("/get_scores/") # API 5
+@file_router.get("/get_scores") # API 5
 def scores(fileID):
     return get_score_item(fileID)

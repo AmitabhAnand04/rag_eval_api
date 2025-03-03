@@ -118,8 +118,15 @@ def update_item(fileID, question_responses):
                 # question["reference_contexts"] = question_data.get("reference_contexts", question.get("reference_contexts", []))
                 # question["reference"] = question_data.get("reference", question.get("reference"))
                 question["response"] = question_data.response if question_data.response is not None else question.get("response")
-                question["reference_contexts"] = question_data.reference_contexts if question_data.reference_contexts is not None else question.get("reference_contexts", [])
-                question["reference"] = question_data.reference if question_data.reference is not None else question.get("reference")
+                if len(question_data.reference_contexts) > 0:
+                    print("reference context is not none so adding its value.")
+                    print(question_data.reference_contexts)
+                    question["reference_contexts"] = question_data.reference_contexts
+                
+                if question_data.reference is not None:
+                    print("reference context is not none so adding its value.")
+                    print(question_data.reference)
+                    question["reference"] = question_data.reference
 
                 updated = True
 
