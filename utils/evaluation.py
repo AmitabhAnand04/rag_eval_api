@@ -100,10 +100,16 @@ def run_all_metrics(df: pd.DataFrame, fileID):
     queue = mp.Queue()
     print("Trying to run all metrices with the testset!!")
     for index, row in df.iterrows():
+        if pd.isna(row["response"]) or row["response"] == "":  # Skip if response is NaN or empty string
+            print(f"Skipping row {index} due to missing response: {row['response']}")
+            continue
+
         print("trying to retrive reference_contexts!!")
         # retrieved_contexts = ast.literal_eval(row["reference_contexts"])  # Safer than eval()
         retrieved_contexts = row["reference_contexts"]  # Safer than eval()
         print("Context Retrived!!")
+        print("response present!!")
+        print(row["response"])
         qID = row["questionID"]
         p1 = mp.Process(target=calculate_faithfulness, args=(row["user_input"], row["response"], retrieved_contexts, queue))
         p2 = mp.Process(target=calculate_response_relevancy, args=(row["user_input"], row["response"], retrieved_contexts, queue))
