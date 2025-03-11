@@ -44,17 +44,17 @@ def calculate_faithfulness(user_input: str, response: str, retrieved_contexts: l
     print(score)
     queue.put(score)
 
-def calculate_response_relevancy(user_input: str, response: str, retrieved_contexts: list, queue):
-    sample = SingleTurnSample(
-        user_input=user_input,
-        response=response,
-        retrieved_contexts=retrieved_contexts
-    )
-    scorer = ResponseRelevancy(llm=evaluator_llm, embeddings=evaluator_embeddings)
-    # queue.put("res_relevency", scorer.single_turn_score(sample))  # Removed 'await'
-    score = {"metric":"res_relevency","score":replace_nan_with_zero(scorer.single_turn_score(sample))}
-    print(score)
-    queue.put(score)  
+# def calculate_response_relevancy(user_input: str, response: str, retrieved_contexts: list, queue):
+#     sample = SingleTurnSample(
+#         user_input=user_input,
+#         response=response,
+#         retrieved_contexts=retrieved_contexts
+#     )
+#     scorer = ResponseRelevancy(llm=evaluator_llm, embeddings=evaluator_embeddings)
+#     # queue.put("res_relevency", scorer.single_turn_score(sample))  # Removed 'await'
+#     score = {"metric":"res_relevency","score":replace_nan_with_zero(scorer.single_turn_score(sample))}
+#     print(score)
+#     queue.put(score)  
     
 def calculate_answer_correctness(user_input: str, response: str, reference: str, queue):
     sample = {
@@ -112,31 +112,31 @@ def run_all_metrics(df: pd.DataFrame, fileID):
         print(row["response"])
         qID = row["questionID"]
         p1 = mp.Process(target=calculate_faithfulness, args=(row["user_input"], row["response"], retrieved_contexts, queue))
-        p2 = mp.Process(target=calculate_response_relevancy, args=(row["user_input"], row["response"], retrieved_contexts, queue))
+        # p2 = mp.Process(target=calculate_response_relevancy, args=(row["user_input"], row["response"], retrieved_contexts, queue))
         p3 = mp.Process(target=calculate_context_precision, args=(row["user_input"], row["response"], retrieved_contexts,row["reference"], queue))
         p4 = mp.Process(target=calculate_context_recall, args=(row["user_input"], row["response"], retrieved_contexts, row["reference"], queue))
         p5 = mp.Process(target=calculate_answer_correctness, args=(row["user_input"], row["response"], row["reference"], queue))
         p1.start()
-        p2.start()
+        # p2.start()
         p3.start()
         p4.start()
         p5.start()
         print("Processes started")
 
         p1.join()
-        p2.join()
+        # p2.join()
         p3.join()
         p4.join()
         p5.join()
         print("Processes joined")
         score1 = queue.get()
-        score2 = queue.get()
+        # score2 = queue.get()
         score3 = queue.get()
         score4 = queue.get()
         score5 = queue.get()
         scorelist = []
         scorelist.append(score1)
-        scorelist.append(score2)
+        # scorelist.append(score2)
         scorelist.append(score3)
         scorelist.append(score4)
         scorelist.append(score5)
