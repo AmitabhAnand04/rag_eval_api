@@ -26,7 +26,7 @@ def welcome():
     return "This API is Live!!"
 
 @file_router.post("/upload") # API 1
-async def process_file(file: UploadFile = File(...), testset_size: int = Form(2)):
+async def process_file(file: UploadFile = File(...), testset_size: int = Form(1)):
     if file.content_type not in ["application/pdf"]:
         raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are allowed.")
     # Create a temporary directory

@@ -14,17 +14,17 @@ def generate_testset(file_stream, testset_size: int):
 
     # Generative model setup
     generator_llm = OpenAI(model="gpt-4o")
-    embeddings = OpenAIEmbedding(embed_batch_size=64)
+    embeddings = OpenAIEmbedding()
 
     generator = TestsetGenerator.from_llama_index(
         llm=generator_llm,
         embedding_model=embeddings,
     )
-
+    print("Testset generator created successfully!!!")
     testset = generator.generate_with_llamaindex_docs(
         documents,
         testset_size=testset_size,
     )
-
+    print("Testset generated successfully!!!")
     df = testset.to_pandas()
     return df
