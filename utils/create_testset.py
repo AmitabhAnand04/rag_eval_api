@@ -26,5 +26,9 @@ def generate_testset(file_stream, testset_size: int):
         testset_size=testset_size,
     )
     print("Testset generated successfully!!!")
+    print(f"len(testset) = {len(testset)} and given testest_size = {testset_size}")
     df = testset.to_pandas()
-    return df
+    if len(df) == testset_size:
+        return df
+    else:
+        return df.head(testset_size)

@@ -145,7 +145,3 @@ def run_all_metrics(df: pd.DataFrame, fileID):
         res = update_score_list(fileID=fileID, questionID=qID, score_list=scorelist)
         print(res)
     return "Metrics score stored sucessfully!!"
-# if __name__ == "__main__":
-#     mp.set_start_method("spawn", force=True)  # Set at the beginning
-#     df = read_testset(file_name="testset_response_(WCF)_9.csv")
-#     run_all_metrics(df)
