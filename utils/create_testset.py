@@ -14,7 +14,7 @@ def generate_testset(file_stream, testset_size: int):
 
     # Generative model setup
     generator_llm = OpenAI(model="gpt-4o")
-    embeddings = OpenAIEmbedding()
+    embeddings = OpenAIEmbedding(dimensions=256, model="text-embedding-3-small")
 
     generator = TestsetGenerator.from_llama_index(
         llm=generator_llm,

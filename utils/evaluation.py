@@ -16,6 +16,7 @@ import ast  # Safe alternative to eval()
 from datasets import Dataset 
 from ragas import evaluate
 from ragas.metrics import answer_correctness
+from ragas.cost import get_token_usage_for_openai
 
 # load .env file
 from dotenv import load_dotenv, find_dotenv
@@ -63,7 +64,12 @@ def calculate_answer_correctness(user_input: str, response: str, reference: str,
             "ground_truth":[reference],
     }
     raga_dataset = Dataset.from_dict(sample)
-    score_0998 = evaluate(raga_dataset,metrics=[answer_correctness])
+    score_0998 = evaluate(
+        raga_dataset,
+        metrics=[answer_correctness],
+        token_usage_parser=get_token_usage_for_openai,
+    )
+    print(f"token used in answer correctness = {score_0998['token_usage']}")
     if score_0998:
         score = {"metric":"answer_correctness","score":replace_nan_with_zero(score_0998["answer_correctness"][0])}
     print(score)
