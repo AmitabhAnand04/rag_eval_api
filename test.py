@@ -1,4 +1,4 @@
-from services.cosmos_service import get_item, get_item_for_evaluation, get_score_item, insert_items, update_item, update_score_list
+# from services.cosmos_service import get_item, get_item_for_evaluation, get_score_item, insert_items, update_item, update_score_list
 # from utils.refactor import transform_to_df, extract_questions_to_df, transform_data
 
 # input_list = [
@@ -74,3 +74,24 @@ from services.cosmos_service import get_item, get_item_for_evaluation, get_score
 # update_score_list(fileID, questionID, scoreList)
 # fileID = "2eed3f93-9822-4715-9b37-ade11e713dc3"
 # print(get_score_item(fileID=fileID))
+
+import pandas as pd
+from ragas.metrics import (
+    Faithfulness,
+    AnswerCorrectness,
+    ContextPrecision,
+    ContextRecall,
+)
+from ragas.llms import LlamaIndexLLMWrapper
+from llama_index.llms.openai import OpenAI
+
+def calculate_score(df: pd.Dataframe):
+    evaluator_llm = LlamaIndexLLMWrapper(OpenAI(model="gpt-4o"))
+    metrics = [
+        Faithfulness(llm=evaluator_llm),
+        AnswerCorrectness(llm=evaluator_llm),
+        ContextPrecision(llm=evaluator_llm),
+        ContextRecall(llm=evaluator_llm),
+    ]
+    
+    

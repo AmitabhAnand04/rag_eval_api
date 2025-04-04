@@ -158,15 +158,15 @@ def update_score_list(fileID, questionID, score_list):
     ]
     
     items = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
-    revised_score_list = {}
-    for score in score_list:
-        revised_score_list[score["metric"]] = score["score"]
+    # revised_score_list = {}
+    # for score in score_list:
+    #     revised_score_list[score["metric"]] = score["score"]
     if items:
         for item in items:
             updated = False
             for test in item.get("testset", []):
                 if test.get("questionID") == questionID:
-                    test["metrics_score"] = revised_score_list
+                    test["metrics_score"] = score_list
                     updated = True
                     break
             
@@ -201,7 +201,7 @@ def get_score_item(fileID):
                 "response": test.get("response"),
                 "context_precision": test.get("metrics_score", {}).get("context_precision"),
                 "context_recall": test.get("metrics_score", {}).get("context_recall"),
-                "res_relevency": test.get("metrics_score", {}).get("res_relevency"),
+                # "res_relevency": test.get("metrics_score", {}).get("res_relevency"),
                 "faithfulness": test.get("metrics_score", {}).get("faithfulness"),
                 "answer_correctness": test.get("metrics_score", {}).get("answer_correctness")
             })

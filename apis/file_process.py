@@ -6,7 +6,7 @@ import os
 from pydantic import BaseModel
 from services.cosmos_service import get_item, get_score_item, insert_items, update_item, get_item_for_evaluation
 from utils.create_testset import generate_testset
-from utils.evaluation import run_all_metrics
+from utils.evaluation_metric import run_metric_calculator
 from utils.refactor import transform_data, transform_to_df
 
 file_router = APIRouter()
@@ -65,12 +65,13 @@ def submit(fileID, request_body: QuestionResponse = None):
     return response
 
 @file_router.post("/evaluate") # API 4
-def evaluate(fileID):
+async def evaluate(fileID):
+    print("going to claculate the metrics")
     items = get_item_for_evaluation(fileID)
     # print(items)
     ragas_df = transform_to_df(items["testset"])
     # ragas_df.to_csv("eval.csv", index=False)
-    return run_all_metrics(df=ragas_df, fileID=fileID)
+    return await run_metric_calculator(df=ragas_df, fileID=fileID)
 
 @file_router.get("/get_scores") # API 5
 def scores(fileID):
