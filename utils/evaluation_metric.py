@@ -14,7 +14,7 @@ load_dotenv(find_dotenv())
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 llm = OpenAI(
     api_key= os.getenv("OPENAI_API_KEY"),
-    max_tokens= 512, 
+    max_tokens= 1024, 
     base_url = "https://oai.helicone.ai/v1",  
     default_headers= {
         "Helicone-Auth": os.getenv("HELICONE_API_KEY")
