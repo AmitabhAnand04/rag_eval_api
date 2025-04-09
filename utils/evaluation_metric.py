@@ -17,8 +17,9 @@ llm = OpenAI(
     max_tokens= 512, 
     base_url = "https://oai.helicone.ai/v1",  
     default_headers= {
-        "Helicone-Auth": "Bearer sk-helicone-h6bsaui-m2ouiyy-xb7ndxa-gdobjsq"
-})
+        "Helicone-Auth": os.getenv("HELICONE_API_KEY")
+    }
+)
 def evaluate_all(user_input: str, response: str, reference: str, retrieved_contexts: list):
     sample = {
             "question":[user_input],
